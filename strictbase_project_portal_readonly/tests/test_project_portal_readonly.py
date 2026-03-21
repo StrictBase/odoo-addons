@@ -1,12 +1,39 @@
+from types import SimpleNamespace
+from unittest.mock import patch
+
 from odoo.exceptions import AccessError
 from odoo.fields import Command
 from odoo.tests import tagged
 
+from odoo.addons.strictbase_project_portal_readonly.controllers.portal import StrictBaseReadonlyPortalMixin
 from odoo.addons.project.tests.test_project_sharing import TestProjectSharingCommon
 
 
 @tagged("-at_install", "post_install")
 class TestProjectPortalReadonly(TestProjectSharingCommon):
+    def test_support_overview_brand_uses_website_company(self):
+        class DummyPortal(StrictBaseReadonlyPortalMixin):
+            def __init__(self, env):
+                self.env = env
+
+            def _prepare_portal_layout_values(self):
+                return {}
+
+            def _get_readonly_projects(self):
+                return self.env["project.project"]
+
+        brand_company = self.env["res.company"].create({"name": "Portal Brand Co"})
+        fake_request = SimpleNamespace(
+            website=SimpleNamespace(company_id=brand_company),
+            env=self.env,
+        )
+
+        with patch("odoo.addons.strictbase_project_portal_readonly.controllers.portal.request", fake_request):
+            values = DummyPortal(self.env)._prepare_support_overview_values()
+
+        self.assertEqual(values["support_overview_brand_name"], "Portal Brand Co")
+        self.assertEqual(values["page_title"], "Portal Brand Co Support Overview")
+
     def test_readonly_all_tasks_grants_full_project_read_without_write(self):
         wizard = self.env["project.share.wizard"].create({
             "res_model": "project.project",

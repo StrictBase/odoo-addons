@@ -7,7 +7,7 @@
                 <div class="mb-4">
                     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3">
                         <div>
-                            <h1 class="h2 mb-2">StrictBase Support Overview</h1>
+                            <h1 class="h2 mb-2"><t t-esc="support_overview_brand_name or res_company.name"/> Support Overview</h1>
                             <p class="text-muted mb-0">This page shows your current and past support tickets, the time spent on each ticket, and the remaining support hours.</p>
                         </div>
                         <div class="flex-shrink-0">

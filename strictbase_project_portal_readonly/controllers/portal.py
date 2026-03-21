@@ -8,6 +8,12 @@ from odoo.addons.portal.controllers.portal import CustomerPortal
 
 
 class StrictBaseReadonlyPortalMixin:
+    def _get_portal_brand_name(self):
+        website = getattr(request, "website", None)
+        if website and website.company_id:
+            return website.company_id.sudo().name
+        return request.env.company.name
+
     def _get_readonly_projects(self):
         partner = request.env.user.partner_id
         if not request.env.user._is_portal():
@@ -59,6 +65,7 @@ class StrictBaseReadonlyPortalMixin:
         return rows
 
     def _prepare_support_overview_values(self, project_id=None):
+        brand_name = self._get_portal_brand_name()
         readonly_projects = self._get_readonly_projects()
         selected_project = readonly_projects.filtered(lambda project: project.id == project_id)[:1] if project_id else readonly_projects[:1]
         projects = selected_project or readonly_projects
@@ -83,7 +90,8 @@ class StrictBaseReadonlyPortalMixin:
         values = {
             **self._prepare_portal_layout_values(),
             "page_name": "support_overview",
-            "page_title": _("StrictBase Support Overview"),
+            "page_title": _("%(brand)s Support Overview", brand=brand_name),
+            "support_overview_brand_name": brand_name,
             "projects": readonly_projects,
             "project_sections": project_sections,
             "selected_project": projects[:1],
