@@ -1,0 +1,7 @@
+*.pyc
+__pycache__/
+.vscode/
+*.swp
+tools/odoo_agent_helper/odoo_local.env
+tools/odoo_agent_helper/odoo_erp.env
+tools/odoo_agent_helper/.cache/

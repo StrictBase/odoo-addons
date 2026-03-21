@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="auth_signup_hide_name_for_readonly_support" inherit_id="auth_signup.signup" name="Hide Name for Readonly Support Signup">
+        <xpath expr="//div[hasclass('field-name')]" position="replace">
+            <t t-if="strictbase_hide_name_on_signup">
+                <input type="hidden" name="name" t-att-value="name or ''"/>
+            </t>
+            <div t-else="" class="mb-3 field-name">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" name="name" t-att-value="name" id="name" class="form-control" placeholder="John Doe"
+                    autofocus="autofocus" required="required"/>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

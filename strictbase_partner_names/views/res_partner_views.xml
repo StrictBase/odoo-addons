@@ -1,0 +1,118 @@
+<odoo>
+    <!-- 1. SEARCH VIEW: Combined fields and context flags -->
+    <record id="view_res_partner_filter_strictbase" model="ir.ui.view">
+        <field name="name">res.partner.select.strictbase</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <!-- Add search fields -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="firstname"/>
+                <field name="lastname"/>
+            </xpath>
+            <!-- Inject context flags into core filters -->
+            <xpath expr="//filter[@name='type_person']" position="attributes">
+                <attribute name="context">{'is_person_view': True}</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='type_company']" position="attributes">
+                <attribute name="context">{'is_company_view': True}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 2. FORM VIEW: Main Partner Form -->
+    <record id="view_partner_form_strictbase_names" model="ir.ui.view">
+        <field name="name">res.partner.form.strictbase.names</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="invisible">is_company == False</attribute>
+                <attribute name="required">is_company == True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="before">
+                <div class="oe_title" invisible="is_company == True">
+                    <label for="firstname" class="oe_edit_only" string="First Name"/>
+                    <h1><field name="firstname" required="is_company == False" placeholder="e.g. Onno"/></h1>
+                    <label for="lastname" class="oe_edit_only" string="Last Name"/>
+                    <h1><field name="lastname" required="is_company == False" placeholder="e.g. Schuit"/></h1>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='child_ids']//form//field[@name='name']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='child_ids']//form//field[@name='name']" position="after">
+                <field name="firstname" placeholder="First Name" required="1"/>
+                <field name="lastname" placeholder="Last Name" required="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 3. TREE VIEW: Columns react to context flags -->
+    <record id="view_partner_tree_strictbase_names" model="ir.ui.view">
+        <field name="name">res.partner.tree.strictbase.names</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='complete_name']" position="before">
+                <field name="firstname" optional="show" 
+                       column_invisible="not context.get('is_person_view')"/>
+                <field name="lastname" optional="show" 
+                       column_invisible="not context.get('is_person_view')"/>
+                <!-- Explicitly add the many2one widget to enable the hyperlink -->
+                <field name="parent_id" 
+                       string="Company" 
+                       widget="many2one"
+                       optional="show" 
+                       column_invisible="not context.get('is_person_view')"/>
+            </xpath>
+            <xpath expr="//field[@name='complete_name']" position="attributes">
+                <attribute name="column_invisible">context.get('is_person_view')</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 4. USERS FORM -->
+    <record id="view_users_form_strictbase" model="ir.ui.view">
+        <field name="name">res.users.form.strictbase</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="before">
+                <group>
+                    <field name="firstname" required="1"/>
+                    <field name="lastname" required="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 5. KANBAN VIEW -->
+    <record id="res_partner_kanban_view_strictbase" model="ir.ui.view">
+        <field name="name">res.partner.kanban.strictbase</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.res_partner_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='avatar_128']" position="after">
+                <field name="firstname"/>
+                <field name="lastname"/>
+            </xpath>
+            <xpath expr="//field[@name='complete_name']" position="before">
+                <field name="firstname" invisible="is_company == True"/>
+                <span invisible="is_company == True"> </span>
+                <field name="lastname" invisible="is_company == True"/>
+            </xpath>
+            <xpath expr="//field[@name='complete_name']" position="attributes">
+                <attribute name="invisible">is_company == False</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 6. ACTION: Apply default search filter -->
+    <record id="contacts.action_contacts" model="ir.actions.act_window">
+        <field name="context">{'search_default_type_person': 1}</field>
+    </record>
+</odoo>

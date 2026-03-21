@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_strictbase_invoice">
+        <t t-set="full_width" t-value="True"/>
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="lang" t-value="o.partner_id.lang or env.lang"/>
+                <t t-set="o" t-value="o.with_context(lang=lang)"/>
+                <t t-set="is_refund" t-value="o.move_type == 'out_refund'"/>
+                <t t-set="doc_title" t-value="'Credit Note' if is_refund else 'Invoice'"/>
+                <t t-set="doc_number_label" t-value="'Credit note # ' if is_refund else 'Invoice # '"/>
+                <t t-if="lang and lang.startswith('nl')">
+                    <t t-set="doc_title" t-value="'Creditnota' if is_refund else 'Factuur'"/>
+                    <t t-set="doc_number_label" t-value="'Creditnota nr. ' if is_refund else 'Factuur nr. '"/>
+                </t>
+                <style>
+                    @page { size: A4; margin: 0; }
+                    * { box-sizing: border-box; }
+                    html, body { margin: 0 !important; padding: 0 !important; width: 210mm; height: 297mm; }
+                    body, body.container, body.container-fluid, body.o_body_html { padding: 0 !important; margin: 0 !important; max-width: none !important; }
+                    body { font-family: "DejaVu Sans", "Liberation Sans", Helvetica, Arial, sans-serif; color: #1a1a1a; font-size: 10pt; }
+                    .o_body_pdf, .o_body_html, #wrapwrap, main { margin: 0 !important; padding: 0 !important; width: 210mm !important; max-width: 210mm !important; }
+                    .strictbase-page-wrapper { width: 210mm; height: 297mm; min-height: 297mm; position: relative; overflow: hidden; page-break-after: always; }
+                    .strictbase-page-bg { position: absolute; top: 0; left: 0; width: 210mm; height: 297mm; z-index: 0; }
+                    .strictbase-page-bg img { width: 100%; height: 100%; display: block; }
+                    .strictbase-page { position: relative; z-index: 1; padding: 48mm 22mm 34mm 20mm; width: 210mm; height: 297mm; min-height: 297mm; }
+                    .strictbase-header { display: table; width: 100%; margin-bottom: 10mm; }
+                    .strictbase-title { display: table-cell; vertical-align: top; font-size: 22pt; font-weight: 700; letter-spacing: 0.02em; }
+                    .strictbase-meta { display: table-cell; vertical-align: top; text-align: right; line-height: 1.7; width: 60mm; }
+                    .strictbase-meta-label { color: #777; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.08em; }
+                    .strictbase-meta-value { font-size: 10pt; font-weight: 700; }
+                    .strictbase-billto { margin-bottom: 7mm; max-width: 90mm; }
+                    .strictbase-section-label { font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.1em; color: #777; margin-bottom: 1.5mm; }
+                    .strictbase-client-name { font-weight: 700; font-size: 10.5pt; }
+                    .strictbase-billto address { font-style: normal; line-height: 1.55; color: #333; margin: 0; }
+                    .strictbase-reference { margin-bottom: 7mm; font-size: 9pt; color: #555; }
+                    .strictbase-reference span { color: #1a1a1a; font-weight: 700; }
+                    table.strictbase-items { width: 100%; border-collapse: collapse; margin-bottom: 6mm; font-size: 9.5pt; table-layout: fixed; }
+                    table.strictbase-items col.col-desc { width: 54%; }
+                    table.strictbase-items col.col-qty { width: 12%; }
+                    table.strictbase-items col.col-rate { width: 14%; }
+                    table.strictbase-items col.col-amount { width: 20%; }
+                    table.strictbase-items thead tr { border-bottom: 1.5pt solid #1a1a1a; }
+                    table.strictbase-items thead th { padding: 0 3mm 2mm 0; text-align: left; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.08em; color: #555; font-weight: 700; }
+                    table.strictbase-items thead th.right { text-align: right; }
+                    table.strictbase-items tbody tr { border-bottom: 0.5pt solid #e0e0e0; }
+                    table.strictbase-items tbody td { padding: 2.4mm 3mm 2.4mm 0; vertical-align: top; }
+                    table.strictbase-items tbody td.right { text-align: right; white-space: nowrap; }
+                    table.strictbase-items tbody td.desc { width: 54%; }
+                    .strictbase-desc-main { white-space: pre-line; }
+                    .strictbase-desc-note { margin-top: 0.8mm; font-size: 8.5pt; color: #666; white-space: pre-line; }
+                    .strictbase-line-note { font-size: 8.8pt; color: #666; font-style: italic; }
+                    .strictbase-line-section { font-weight: 700; }
+                    .strictbase-totals { margin-bottom: 8mm; }
+                    .strictbase-totals table { width: 100%; border-collapse: collapse; font-size: 9.5pt; table-layout: fixed; }
+                    .strictbase-totals col.col-desc { width: 54%; }
+                    .strictbase-totals col.col-qty { width: 12%; }
+                    .strictbase-totals col.col-rate { width: 14%; }
+                    .strictbase-totals col.col-amount { width: 20%; }
+                    .strictbase-totals td { padding: 2.4mm 3mm 2.4mm 0; }
+                    .strictbase-totals td.label { color: #555; text-align: right; white-space: nowrap; }
+                    .strictbase-totals td.amount { text-align: right; white-space: nowrap; }
+                    .strictbase-total-row td { font-size: 11pt; font-weight: 700; border-top: 1.5pt solid #1a1a1a; padding-top: 2mm; color: #1a1a1a; }
+                    .strictbase-payment-terms { font-size: 9pt; color: #444; line-height: 1.6; border-top: 0.5pt solid #e0e0e0; padding-top: 4mm; }
+                    .strictbase-payment-terms strong { color: #1a1a1a; }
+                    .strictbase-tax-note { margin-top: 4mm; font-size: 8.5pt; color: #666; line-height: 1.55; }
+                </style>
+                <t t-set="bg_uri" t-value="o._strictbase_invoice_background_data_uri()"/>
+                <div class="strictbase-page-wrapper">
+                    <div class="strictbase-page-bg" t-if="bg_uri">
+                        <img t-att-src="bg_uri" alt=""/>
+                    </div>
+                    <div class="strictbase-page">
+                        <div class="strictbase-header">
+                            <div class="strictbase-title">
+                                <t t-out="doc_title"/>
+                            </div>
+                            <div class="strictbase-meta">
+                                <div class="strictbase-meta-label">
+                                    <t t-out="doc_number_label"/>
+                                </div>
+                                <div class="strictbase-meta-value" t-field="o.name"/>
+                                <br/>
+                                <div class="strictbase-meta-label">
+                                    <t t-out="'Credit note date' if is_refund and not (lang and lang.startswith('nl')) else 'Factuurdatum' if lang and lang.startswith('nl') else 'Invoice date'"/>
+                                </div>
+                                <div class="strictbase-meta-value" t-field="o.invoice_date"/>
+                                <br/>
+                                <div class="strictbase-meta-label">
+                                    <t t-out="'Due date' if not (lang and lang.startswith('nl')) else 'Vervaldatum'"/>
+                                </div>
+                                <div class="strictbase-meta-value" t-field="o.invoice_date_due"/>
+                            </div>
+                        </div>
+
+                        <div class="strictbase-billto">
+                            <div class="strictbase-section-label">
+                                <t t-out="'Bill to' if not (lang and lang.startswith('nl')) else 'Factureren aan'"/>
+                            </div>
+                            <div class="strictbase-client-name" t-field="o.partner_id.name"/>
+                            <address>
+                                <t t-if="o.partner_id.parent_id and o.partner_id.type == 'contact'">
+                                    <div t-field="o.partner_id.display_name"/>
+                                </t>
+                                <div t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}'/>
+                                <t t-if="o.partner_id.vat and (o.tax_totals or o.fiscal_position_id.foreign_vat)">
+                                    <div>
+                                        <t t-out="'VAT' if not (lang and lang.startswith('nl')) else 'BTW'"/>:
+                                        <span t-field="o.partner_id.vat"/>
+                                    </div>
+                                </t>
+                            </address>
+                        </div>
+
+                        <div class="strictbase-reference" t-if="o.ref and o.ref != o.invoice_origin">
+                            <t t-out="'Reference' if not (lang and lang.startswith('nl')) else 'Referentie'"/>:
+                            <span t-field="o.ref"/>
+                        </div>
+
+                        <table class="strictbase-items">
+                            <colgroup>
+                                <col class="col-desc"/>
+                                <col class="col-qty"/>
+                                <col class="col-rate"/>
+                                <col class="col-amount"/>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="desc">
+                                        <t t-out="'Description' if not (lang and lang.startswith('nl')) else 'Omschrijving'"/>
+                                    </th>
+                                    <th class="right">
+                                        <t t-out="'Qty' if not (lang and lang.startswith('nl')) else 'Aantal'"/>
+                                    </th>
+                                    <th class="right">
+                                        <t t-out="'Rate' if not (lang and lang.startswith('nl')) else 'Tarief'"/>
+                                    </th>
+                                    <th class="right">
+                                        <t t-out="'Amount' if not (lang and lang.startswith('nl')) else 'Bedrag'"/>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o._get_move_lines_to_report()" t-as="line">
+                                    <t t-if="line.display_type == 'product'">
+                                        <t t-set="line_parts" t-value="o._strictbase_invoice_line_parts(line)"/>
+                                        <tr>
+                                            <td class="desc">
+                                                <div class="strictbase-desc-main">
+                                                    <t t-out="line_parts['main']"/>
+                                                </div>
+                                                <div class="strictbase-desc-note" t-if="line_parts['note']">
+                                                    <t t-out="line_parts['note']"/>
+                                                </div>
+                                            </td>
+                                            <td class="right">
+                                                <span t-field="line.quantity"/>
+                                            </td>
+                                            <td class="right">
+                                                <span t-field="line.price_unit"/>
+                                            </td>
+                                            <td class="right">
+                                                <span t-out="o._strictbase_format_amount_html(line.price_subtotal, o.currency_id)"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <t t-elif="line.display_type == 'line_section'">
+                                        <tr>
+                                            <td colspan="4" class="strictbase-line-section">
+                                                <span t-field="line.name"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <t t-elif="line.display_type == 'line_note'">
+                                        <tr>
+                                            <td colspan="4" class="strictbase-line-note">
+                                                <span t-field="line.name"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <div class="strictbase-totals">
+                            <table>
+                                <colgroup>
+                                    <col class="col-desc"/>
+                                    <col class="col-qty"/>
+                                    <col class="col-rate"/>
+                                    <col class="col-amount"/>
+                                </colgroup>
+                                <tr>
+                                    <td class="label" colspan="3">
+                                        <t t-out="'Subtotal' if not (lang and lang.startswith('nl')) else 'Subtotaal'"/>
+                                    </td>
+                                    <td class="amount">
+                                        <span t-out="o._strictbase_format_amount_html(o.amount_untaxed, o.currency_id)"/>
+                                    </td>
+                                </tr>
+                                <t t-foreach="(o.tax_totals or {}).get('subtotals', [])" t-as="subtotal_line">
+                                    <t t-foreach="subtotal_line.get('tax_groups', [])" t-as="tax_group">
+                                        <tr>
+                                            <td class="label" colspan="3">
+                                                <t t-out="o._strictbase_tax_group_label(tax_group)"/>
+                                            </td>
+                                            <td class="amount">
+                                                <span t-out="o._strictbase_format_amount_html(tax_group.get('tax_amount_currency', tax_group.get('tax_amount', 0.0)), o.currency_id)"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                                <tr class="strictbase-total-row">
+                                    <td class="label" colspan="3">
+                                        <t t-out="'Total' if not (lang and lang.startswith('nl')) else 'Totaal'"/>
+                                    </td>
+                                    <td class="amount">
+                                        <span t-out="o._strictbase_format_amount_html(o.amount_total, o.currency_id)"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="strictbase-payment-terms">
+                            <t t-if="o.invoice_payment_term_id and o.invoice_payment_term_id.note">
+                                <span t-field="o.invoice_payment_term_id.note"/>
+                                <br/>
+                            </t>
+                            <t t-if="o.payment_reference">
+                                <t t-out="'Reference: ' if not (lang and lang.startswith('nl')) else 'Kenmerk: '"/>
+                                <strong t-field="o.payment_reference"/>
+                            </t>
+                        </div>
+
+                        <div class="strictbase-tax-note" t-if="is_html_empty(o.taxes_legal_notes) and not is_html_empty(o.fiscal_position_id.note)">
+                            <span t-field="o.fiscal_position_id.note"/>
+                        </div>
+                        <div class="strictbase-tax-note" t-if="not is_html_empty(o.taxes_legal_notes)">
+                            <span t-field="o.taxes_legal_notes"/>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

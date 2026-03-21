@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_journal_form_inherit_strictbase_invoice_template" model="ir.ui.view">
+        <field name="name">account.journal.form.inherit.strictbase.invoice.template</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account.view_account_journal_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_template_pdf_report_id']" position="after">
+                <field name="strictbase_invoice_sequence_enabled" invisible="type != 'sale'"/>
+                <field name="strictbase_invoice_sequence_start" invisible="type != 'sale' or not strictbase_invoice_sequence_enabled"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

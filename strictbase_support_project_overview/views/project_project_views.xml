@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_project_project_filter_support_overview" model="ir.ui.view">
+        <field name="name">project.project.search.support.overview</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_project_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="before">
+                <filter
+                    name="support_ticket_projects"
+                    string="Support Ticket Projects"
+                    domain="[('is_support_ticket_project', '=', True)]"
+                />
+                <filter
+                    name="support_low_balance"
+                    string="Low Support Balance"
+                    domain="[('is_support_ticket_project', '=', True), ('support_remaining_hours', '&lt;', 4)]"
+                />
+                <filter
+                    name="support_needs_reload"
+                    string="Needs Reload"
+                    domain="[('is_support_ticket_project', '=', True), ('support_remaining_hours', '&lt;=', 0)]"
+                />
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_project_support_reload_overview" model="ir.ui.view">
+        <field name="name">project.project.list.support.reload.overview</field>
+        <field name="model">project.project</field>
+        <field name="arch" type="xml">
+            <list
+                string="Support Reload Overview"
+                default_order="support_remaining_hours asc, name asc, id"
+                decoration-muted="active == False"
+            >
+                <field name="active" column_invisible="True"/>
+                <field name="is_template" column_invisible="True"/>
+                <field name="is_support_ticket_project" column_invisible="True"/>
+                <field name="name" class="fw-bold"/>
+                <field name="partner_id" string="Customer" optional="show"/>
+                <field name="sale_line_id" string="Active SO Item" optional="show"/>
+                <field name="support_hours_ordered" string="Ordered" optional="show"/>
+                <field name="support_hours_delivered" string="Delivered" optional="show"/>
+                <field
+                    name="support_remaining_hours"
+                    string="Remaining"
+                    optional="show"
+                    decoration-danger="support_remaining_hours &lt;= 0"
+                    decoration-warning="support_remaining_hours &gt; 0 and support_remaining_hours &lt; 4"
+                />
+                <field name="user_id" string="Project Manager" widget="many2one_avatar_user" optional="hide"/>
+                <button string="View Tasks" name="action_view_tasks" type="object"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_project_support_reload_overview" model="ir.actions.act_window">
+        <field name="name">Support Reload Overview</field>
+        <field name="res_model">project.project</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="view_id" ref="view_project_support_reload_overview"/>
+        <field name="search_view_id" ref="project.view_project_project_filter"/>
+        <field name="domain">[('is_support_ticket_project', '=', True)]</field>
+        <field name="context">{'search_default_support_ticket_projects': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Support projects appear here once tagged with Support Tickets.
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_project_report_support_reload_overview"
+        name="Support Reload Overview"
+        parent="project.menu_project_report"
+        action="action_project_support_reload_overview"
+        groups="project.group_project_user,project.group_project_manager"
+        sequence="20"
+    />
+</odoo>

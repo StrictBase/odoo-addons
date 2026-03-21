@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_move_form_inherit_strictbase_invoice_template" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.strictbase.invoice.template</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@id='other_tab_group']" position="after">
+                <group
+                    string="Tax Note Preview"
+                    invisible="move_type not in ('out_invoice', 'out_refund') or not strictbase_tax_note_preview"
+                >
+                    <field
+                        name="strictbase_tax_note_preview"
+                        widget="html"
+                        nolabel="1"
+                        readonly="1"
+                    />
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

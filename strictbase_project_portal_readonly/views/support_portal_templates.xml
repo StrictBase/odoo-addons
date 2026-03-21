@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_my_support" name="Support Overview">
+        <t t-call="portal.portal_layout">
+            <div class="container py-4">
+                <div class="mb-4">
+                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3">
+                        <div>
+                            <h1 class="h2 mb-2">StrictBase Support Overview</h1>
+                            <p class="text-muted mb-0">This page shows your current and past support tickets, the time spent on each ticket, and the remaining support hours.</p>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <button type="button" class="btn btn-outline-primary" id="strictbase-support-export" t-att-data-project-name="selected_project and selected_project.name or 'support-overview'">Export to Excel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <t t-if="len(projects) &gt; 1">
+                    <div class="mb-4 d-flex flex-wrap gap-2">
+                        <t t-foreach="projects" t-as="project">
+                            <a class="btn btn-outline-secondary"
+                               t-att-class="'btn btn-primary' if selected_project and project == selected_project else 'btn btn-outline-secondary'"
+                               t-att-href="'/my?project_id=%s' % project.id">
+                                <t t-esc="project.name"/>
+                            </a>
+                        </t>
+                    </div>
+                </t>
+
+                <t t-foreach="project_sections" t-as="section">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 mb-4">
+                                <div>
+                                    <h2 class="h4 mb-1">
+                                        <t t-esc="section['project'].name"/>
+                                    </h2>
+                                    <div class="text-muted">
+                                        <t t-esc="len(section['open_tasks'])"/> current tickets
+                                        <span> • </span>
+                                        <t t-esc="len(section['closed_tasks'])"/> past tickets
+                                    </div>
+                                </div>
+                                <div class="border rounded px-3 py-2 text-lg-end">
+                                    <div class="small text-muted">Remaining support hours</div>
+                                    <div class="h3 mb-0">
+                                        <t t-if="section['remaining_hours_label']">
+                                            <t t-esc="section['remaining_hours_label']"/>
+                                        </t>
+                                        <t t-else="">Not available</t>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h3 class="h5 mb-3">Current Tickets</h3>
+                                <t t-if="section['open_tasks']">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm align-middle mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ticket</th>
+                                                    <th>Status</th>
+                                                    <th class="text-end">Time Spent</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="section['open_tasks']" t-as="task">
+                                                    <td>
+                                                        <a t-attf-href="/my/projects/{{ section['project'].id }}/task/{{ task.id }}">
+                                                            <t t-esc="task.name"/>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge text-bg-light border">
+                                                            <t t-esc="task.stage_id.name or 'Open'"/>
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <t t-esc="('%.2f' % task.total_hours_spent).rstrip('0').rstrip('.')"/> h
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="text-muted">There are no current tickets.</div>
+                                </t>
+                            </div>
+
+                            <div>
+                                <h3 class="h5 mb-3">Past Tickets</h3>
+                                <t t-if="section['closed_tasks']">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm align-middle mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ticket</th>
+                                                    <th>Status</th>
+                                                    <th class="text-end">Time Spent</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="section['closed_tasks']" t-as="task">
+                                                    <td>
+                                                        <a t-attf-href="/my/projects/{{ section['project'].id }}/task/{{ task.id }}">
+                                                            <t t-esc="task.name"/>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge text-bg-success">
+                                                            <t t-esc="task.stage_id.name or 'Done'"/>
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <t t-esc="('%.2f' % task.total_hours_spent).rstrip('0').rstrip('.')"/> h
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="text-muted">There are no past tickets yet.</div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+
+            <div id="strictbase-support-export-data" class="d-none">
+                <t t-foreach="project_sections" t-as="section">
+                    <table class="strictbase-export-overview">
+                        <thead>
+                            <tr>
+                                <th>Project</th>
+                                <th>Current Tickets</th>
+                                <th>Past Tickets</th>
+                                <th>Remaining Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><t t-esc="section['project'].name"/></td>
+                                <td><t t-esc="len(section['open_tasks'])"/></td>
+                                <td><t t-esc="len(section['closed_tasks'])"/></td>
+                                <td><t t-esc="section['remaining_hours_label'] or ''"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="strictbase-export-tickets">
+                        <thead>
+                            <tr>
+                                <th>Project</th>
+                                <th>Ticket</th>
+                                <th>Status</th>
+                                <th>Category</th>
+                                <th>Time Spent</th>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="section['export_task_rows']" t-as="row">
+                                <td><t t-esc="row['project_name']"/></td>
+                                <td><t t-esc="row['task_name']"/></td>
+                                <td><t t-esc="row['status']"/></td>
+                                <td><t t-esc="row['category']"/></td>
+                                <td><t t-esc="row['time_spent_label']"/></td>
+                                <td>
+                                    <t t-if="row['worklogs']">
+                                        <div t-foreach="row['worklogs']" t-as="worklog">
+                                            <t t-esc="worklog['date']"/>
+                                        </div>
+                                    </t>
+                                </td>
+                                <td>
+                                    <t t-if="row['worklogs']">
+                                        <div t-foreach="row['worklogs']" t-as="worklog">
+                                            <t t-esc="worklog['description']"/>
+                                        </div>
+                                    </t>
+                                </td>
+                                <td>
+                                    <t t-if="row['worklogs']">
+                                        <div t-foreach="row['worklogs']" t-as="worklog">
+                                            <t t-esc="worklog['hours']"/>
+                                        </div>
+                                    </t>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+            </div>
+
+            <script type="text/javascript"><![CDATA[
+                (() => {
+                    const button = document.getElementById("strictbase-support-export");
+                    const container = document.getElementById("strictbase-support-export-data");
+                    if (!button || !container) {
+                        return;
+                    }
+                    button.addEventListener("click", () => {
+                        const projectName = button.dataset.projectName || "support-overview";
+                        const workbookHtml = `
+                            <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                                  xmlns:x="urn:schemas-microsoft-com:office:excel"
+                                  xmlns="http://www.w3.org/TR/REC-html40">
+                                <head>
+                                    <meta charset="utf-8">
+                                    <style>
+                                        table { border-collapse: collapse; margin-bottom: 24px; width: 100%; }
+                                        th, td { border: 1px solid #999; padding: 6px 8px; text-align: left; vertical-align: top; }
+                                        th { background: #d9e2f3; font-weight: 700; }
+                                        h2 { margin: 16px 0 8px; }
+                                    </style>
+                                </head>
+                                <body>${container.innerHTML}</body>
+                            </html>
+                        `;
+                        const blob = new Blob([workbookHtml], { type: "application/vnd.ms-excel;charset=utf-8;" });
+                        const link = document.createElement("a");
+                        link.href = URL.createObjectURL(blob);
+                        link.download = `${projectName.replace(/[^A-Za-z0-9_-]+/g, "-") || "support-overview"}.xls`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(link.href);
+                    });
+                })();
+            ]]></script>
+        </t>
+    </template>
+
+    <template id="my_account_link_readonly_target" inherit_id="portal.user_dropdown" name="My Account Link Target">
+        <xpath expr="//*[@id='o_logout_divider']" position="before">
+            <a href="/my/account" role="menuitem" class="dropdown-item ps-3">
+                <i class="fa fa-fw fa-id-card-o me-1 small text-primary-emphasis"/> My Account
+            </a>
+        </xpath>
+    </template>
+
+    <template id="change_password_link_readonly_target" inherit_id="portal.user_dropdown" name="Change Password Link">
+        <xpath expr="//*[@id='o_logout_divider']" position="before">
+            <a href="/my/security" role="menuitem" class="dropdown-item ps-3">
+                <i class="fa fa-fw fa-key me-1 small text-primary-emphasis"/> Change Password
+            </a>
+        </xpath>
+    </template>
+
+    <template id="portal_my_support_task" name="Support Ticket">
+        <t t-call="portal.portal_layout">
+            <div class="container py-4">
+                <div class="mb-4">
+                    <a t-att-href="'/my?project_id=%s' % project.id" class="small text-decoration-none">&lt; Back to support overview</a>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3">
+                            <div>
+                                <div class="text-muted small mb-2">
+                                    <t t-esc="project.name"/>
+                                </div>
+                                <h1 class="h3 mb-2">
+                                    <t t-esc="task.name"/>
+                                </h1>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge text-bg-light border">
+                                        <t t-esc="task.stage_id.name or ('Done' if task.is_closed else 'Open')"/>
+                                    </span>
+                                    <span class="badge text-bg-light border">
+                                        Time spent: <t t-esc="time_spent_label"/>
+                                    </span>
+                                    <span class="badge text-bg-light border">
+                                        Remaining hours:
+                                        <t t-if="remaining_hours_label">
+                                            <t t-esc="remaining_hours_label"/>
+                                        </t>
+                                        <t t-else="">Not available</t>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <t t-if="task.description">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h2 class="h5 mb-3">Ticket Details</h2>
+                            <div t-field="task.description"/>
+                        </div>
+                    </div>
+                </t>
+
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h5 mb-3">Work Logged</h2>
+                        <t t-if="timesheets">
+                            <div class="table-responsive">
+                                <table class="table table-sm align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Description</th>
+                                            <th class="text-end">Hours</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="timesheets" t-as="line">
+                                            <td>
+                                                <span t-field="line.date"/>
+                                            </td>
+                                            <td>
+                                                <t t-esc="line.name or '-'"/>
+                                            </td>
+                                            <td class="text-end">
+                                                <t t-esc="('%.2f' % line.unit_amount).rstrip('0').rstrip('.')"/> h
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="text-muted">No work has been logged on this ticket yet.</div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

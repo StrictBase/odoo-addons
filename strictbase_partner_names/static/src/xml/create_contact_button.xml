@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="strictbase_partner_names.CreateContactButton">
+        <button type="button"
+                class="btn btn-primary btn-sm ms-2"
+                t-on-click="onClick"
+                t-on-keydown.stop.prevent="onKeydown">
+            Create
+        </button>
+    </t>
+</templates>

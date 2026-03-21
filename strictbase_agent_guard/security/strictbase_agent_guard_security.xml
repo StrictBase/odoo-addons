@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_agent_confirmation_approver" model="res.groups">
+        <field name="name">Agent Confirmation Approver</field>
+        <field name="comment">Users in this group may issue outbound confirmation tokens for agent actions.</field>
+    </record>
+</odoo>

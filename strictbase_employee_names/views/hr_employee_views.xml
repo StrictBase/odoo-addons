@@ -1,0 +1,48 @@
+<odoo>
+    <!-- 1. SEARCH VIEW: Add first and last name search fields -->
+    <record id="view_employee_filter_strictbase_names" model="ir.ui.view">
+        <field name="name">hr.employee.filter.strictbase.names</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="firstname"/>
+                <field name="lastname"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 2. FORM VIEW: Replace the single Name field with First Name + Last Name -->
+    <record id="view_employee_form_strictbase_names" model="ir.ui.view">
+        <field name="name">hr.employee.form.strictbase.names</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <!-- Hide the original name field (it stays as a related field to resource_id.name) -->
+            <xpath expr="//sheet//field[@name='name']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <!-- Add First Name / Last Name in the title area -->
+            <xpath expr="//sheet//field[@name='name']" position="before">
+                <group>
+                    <field name="firstname" required="1"/>
+                    <field name="lastname" required="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 3. TREE VIEW: Add First Name / Last Name columns -->
+    <record id="view_employee_tree_strictbase_names" model="ir.ui.view">
+        <field name="name">hr.employee.tree.strictbase.names</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="firstname" optional="show"/>
+                <field name="lastname" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

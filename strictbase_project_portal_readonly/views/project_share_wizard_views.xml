@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="project_share_wizard_view_form_readonly_all" model="ir.ui.view">
+        <field name="name">project.share.wizard.view.form.readonly.all</field>
+        <field name="model">project.share.wizard</field>
+        <field name="inherit_id" ref="project.project_share_wizard_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//ul[hasclass('text-muted')]" position="inside">
+                <li>Read-only (all tasks): collaborators can view all project tasks and their portal details, but cannot edit tasks or create new ones.</li>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

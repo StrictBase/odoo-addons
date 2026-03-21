@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="login_oauth_without_odoo_com" inherit_id="web.login_oauth" name="Hide Odoo.com Login Button">
+        <xpath expr="//div[hasclass('o_login_auth')]" position="replace">
+            <t t-set="strictbase_auth_btns" t-value="[p for p in auth_btns if p.get('body') not in ('Sign in with Odoo.com', 'Sign in with Odoo')]"/>
+            <div t-if="strictbase_auth_btns" class="o_login_auth">
+                <em class="d-block my-3 small text-center text-muted">- or -</em>
+                <div class="list-group">
+                    <a t-foreach="strictbase_auth_btns" t-as="p" t-attf-class="{{p.get('list_item_class')}} list-group-item list-group-item-action d-flex align-items-center gap-2 py-2" t-att-href="p.get('auth_link') or '#'">
+                        <i t-att-class="p['css_class']" role="presentation"/>
+                        <span class="mx-auto" t-out="p['body']"/>
+                    </a>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

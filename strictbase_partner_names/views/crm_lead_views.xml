@@ -1,0 +1,90 @@
+<odoo>
+    <record id="crm_lead_view_form_strictbase_main" model="ir.ui.view">
+        <field name="name">crm.lead.form.strictbase.main</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            
+            <!-- Force is_company into the view for UI logic -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="is_company" invisible="1"/>
+            </xpath>
+
+            <!-- HIDE THE CONTAINERS -->
+            <xpath expr="//label[@for='contact_name_page_lead']" position="attributes">
+                <attribute name="invisible">is_company == False</attribute>
+            </xpath>
+            <xpath expr="//div[field[@id='contact_name_page_lead']]" position="attributes">
+                <attribute name="invisible">is_company == False</attribute>
+            </xpath>
+
+            <!-- INSERT THE NEW FIELDS -->
+            <xpath expr="//div[field[@id='contact_name_page_lead']]" position="after">
+                <!-- Dropdown for Scenario 2: Select from Brent, Lynn, etc. -->
+                <field name="contact_id" 
+                       string="Contact Person"
+                       invisible="not commercial_partner_id or is_company == True"
+                       domain="[('parent_id', '=', commercial_partner_id), ('is_company', '=', False)]"
+                       options="{'no_create': True, 'no_open': True}"/>
+
+                <field name="contact_firstname" 
+                       string="First Name" 
+                       invisible="is_company == True" 
+                       required="is_company == False"/>
+                <field name="contact_lastname" 
+                       string="Last Name" 
+                       invisible="is_company == True" 
+                       required="is_company == False"/>
+            </xpath>
+
+            <!-- HANDLE OTHER OCCURRENCES -->
+            <xpath expr="//field[@name='contact_name' and not(@id='contact_name_page_lead')]" position="attributes">
+                <attribute name="invisible">is_company == False</attribute>
+            </xpath>
+            <xpath expr="//field[@name='contact_name' and not(@id='contact_name_page_lead')]" position="after">
+                <field name="contact_firstname" string="First Name" invisible="is_company == True"/>
+                <field name="contact_lastname" string="Last Name" invisible="is_company == True"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- QUICK CREATE: Fixes the pop-over when clicking "+" or "New" -->
+    <record id="quick_create_opportunity_form_strictbase" model="ir.ui.view">
+        <field name="name">crm.lead.form.quick_create.strictbase</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.quick_create_opportunity_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='commercial_partner_id']" position="after">
+                <field name="company_has_contacts" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//group[hasclass('crm_quick_create_opportunity_form_group')]/div[field[@name='partner_id']]" position="attributes">
+                <attribute name="invisible">not commercial_partner_id or not company_has_contacts</attribute>
+            </xpath>
+
+            <xpath expr="//div[field[@name='partner_id']]" position="after">
+                <div class="d-flex align-items-center" colspan="2">
+                    <i class="fa fa-user" title="New contact"/>
+                    <field name="contact_firstname"
+                        placeholder="First Name"
+                        nolabel="1"
+                        class="o_field_highlight w-100 mb-0"/>
+                    <field name="contact_lastname"
+                        placeholder="Last Name"
+                        nolabel="1"
+                        class="o_field_highlight w-100 mb-0"/>
+                    <field name="create_contact_button"
+                        widget="create_contact_button"
+                        nolabel="1"/>
+                </div>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>
