@@ -4,6 +4,8 @@
 
 **Technical name:** `strictbase_partner_names`
 
+See the explanator article: <https://strictbase.com/guides/odoo-partner-names.html>.
+
 ### Overview
 
 `strictbase_partner_names` introduces **split firstname / lastname support** for partners and integrates this model change into **CRM lead creation workflows**, including the CRM Kanban “Quick Create” card.

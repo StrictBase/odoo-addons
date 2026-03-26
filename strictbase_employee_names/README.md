@@ -2,6 +2,8 @@
 
 Adds `firstname` and `lastname` for employees in Odoo 19.0 CE.
 
+See the explanator article: <https://strictbase.com/guides/odoo-partner-names.html>.
+
 ## Data model
 
 - `resource.resource` gets `firstname` + `lastname` and remains the single source of truth for the display name (`name`) for human resources.
