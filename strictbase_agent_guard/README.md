@@ -152,6 +152,8 @@ The tests cover the main expected behavior:
 
 This module is part of a broader StrictBase agent-access setup.
 
+See the explanator article: <https://strictbase.com/guides/odoo-agent-access.html>.
+
 The intended pattern is:
 
 1. agent uses broad JSON-2 access
