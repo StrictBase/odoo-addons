@@ -1,10 +1,12 @@
 # README – strictbase_partner_names
 
+## Guide
+
+→ [Name Fields Done Right: Firstname/Lastname for Partners and Employees in Odoo CE](https://strictbase.com/guides/odoo-partner-names.html) — StrictBase Guides
+
 ## Module: StrictBase Partner Names
 
 **Technical name:** `strictbase_partner_names`
-
-See the explanator article: <https://strictbase.com/guides/odoo-partner-names.html>.
 
 ### Overview
 

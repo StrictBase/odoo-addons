@@ -1,5 +1,9 @@
 # strictbase_task_sol_lock
 
+## Guide
+
+→ [Client Support on Odoo CE: Prepaid Wallets, Ticket Tracking, Batch Reloading](https://strictbase.com/guides/odoo-support-ticketing.html) — StrictBase Guides
+
 **Odoo 19.0 CE — StrictBase custom module**
 
 Preserves historical timesheet SO lines when a task's Sales Order Item (`sale_line_id`) is switched to a new one.

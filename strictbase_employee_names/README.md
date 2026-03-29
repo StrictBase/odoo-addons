@@ -1,8 +1,10 @@
 # StrictBase Employee Names
 
-Adds `firstname` and `lastname` for employees in Odoo 19.0 CE.
+## Guide
 
-See the explanator article: <https://strictbase.com/guides/odoo-partner-names.html>.
+→ [Name Fields Done Right: Firstname/Lastname for Partners and Employees in Odoo CE](https://strictbase.com/guides/odoo-partner-names.html) — StrictBase Guides
+
+Adds `firstname` and `lastname` for employees in Odoo 19.0 CE.
 
 ## Data model
 

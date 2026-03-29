@@ -1,5 +1,9 @@
 # `strictbase_agent_guard`
 
+## Guide
+
+→ [Giving Your AI Agent a Seat in Odoo](https://strictbase.com/guides/odoo-agent-access.html) — StrictBase Guides
+
 Odoo 19.0 Community Edition module for agent-mode outbound safety.
 
 ## Purpose
@@ -151,8 +155,6 @@ The tests cover the main expected behavior:
 ## Intended Use
 
 This module is part of a broader StrictBase agent-access setup.
-
-See the explanator article: <https://strictbase.com/guides/odoo-agent-access.html>.
 
 The intended pattern is:
 

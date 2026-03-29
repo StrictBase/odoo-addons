@@ -1,5 +1,9 @@
 # strictbase_currency_fix
 
+## Guide
+
+→ [Odoo's Currency Formatting Is Architecturally Broken](https://strictbase.com/guides/odoo-currency-formatting.html) — StrictBase Guides
+
 ## Purpose
 
 `strictbase_currency_fix` enforces **correct, locale-aware currency formatting** in Odoo Community Edition.

@@ -1,5 +1,9 @@
 # strictbase_worked_not_invoiced_report
 
+## Guide
+
+→ [Worked, Not Invoiced: An Operational Report for Service Billing in Odoo CE](https://strictbase.com/guides/odoo-worked-not-invoiced.html) — StrictBase Guides
+
 Operational list view for sales order lines where service work was delivered but
 the line still needs invoicing.
 
